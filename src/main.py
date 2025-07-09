@@ -69,9 +69,9 @@ def predict_ui():
                 print(f"Selected phone: {phone}\n")
                 predictImage(
                     image_path=image_path,
-                    model_path=os.path.join(DATA_DIR, 'models', f'classifier_model_{phone}.pkl'),
-                    scaler_path=os.path.join(DATA_DIR, 'models', f'classifier_scaler_model_{phone}.pkl'),
                     out_path=out_path,
+                    phone=phone,
+                    summary_path=os.path.join(DATA_DIR, 'models', 'classification_summary.csv')
                 )
                 print("Prediction completed.\n")
             except Exception as e:

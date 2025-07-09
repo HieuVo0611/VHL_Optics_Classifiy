@@ -11,10 +11,10 @@ from normalize import FeatureExtractor
 
 
 def predictImage(
-        image_path:str=None,
-        model_path:str=None,
-        scaler_path:str=None,
-        out_path:str=None,
+        image_path: str = None,
+        out_path: str = None,
+        phone: str = None,
+        summary_path: str = None
 ):
     os.makedirs(out_path, exist_ok=True)
     os.makedirs(os.path.join(out_path, "image"), exist_ok=True)
@@ -63,11 +63,28 @@ def predictImage(
     del extractor, classification_features, regression_features
 
     X_class = cls_df.drop(columns=['id_img','type'])
-    scaler = joblib.load(scaler_path)
-    X_class_scaled = scaler.transform(X_class)
-    clf_model = joblib.load(model_path)
-    class_pred = clf_model.predict(X_class_scaled)
-    
-    print(f"Predicted class: {class_pred[0]}")
+    model_name = get_best_model_name(phone, summary_path)
+    model_path = os.path.join(summary_path.replace('classification_summary.csv', ''), f'{model_name}_model_{phone}.pkl')
+    scaler_path = os.path.join(summary_path.replace('classification_summary.csv', ''), f'{model_name}_scaler_{phone}.pkl')
 
+    scaler = joblib.load(scaler_path)
+    clf_model = joblib.load(model_path)
+
+    X_class_scaled = scaler.transform(X_class)
+    class_pred = clf_model.predict(X_class_scaled)
+
+    label_encoder_path = os.path.join(summary_path.replace('classification_summary.csv', ''), f'{model_name}_label_encoder_{phone}.pkl')
+    label_encoder = joblib.load(label_encoder_path)
+    label_str = label_encoder.inverse_transform(class_pred)
+
+    print(f"Predicted class: {label_str[0]}")
+
+def get_best_model_name(phone, summary_path):
+    df = pd.read_csv(summary_path)
+    df_phone = df[df['phone'] == phone]
+    if df_phone.empty:
+        raise ValueError(f"No models found for phones: {phone}")
     
+    # Choose highest F1-score model
+    best_row = df_phone.sort_values(by='f1_macro', ascending=False).iloc[0]
+    return best_row['model']
