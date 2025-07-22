@@ -24,3 +24,15 @@ HSV_KITS = {
     "1.1.1.1.0":[(35, 102, 76), (95, 255, 255)],    # Hue, Saturation, Value of 4 types of phones (mi8 lite, nokia, oppo, poco f3)
     "1.1.1.0.1":[(35, 100, 70), (100, 255, 255)]    # Hue, Saturation, Value of a phone (samsung)
     }
+
+#CSV feature folder
+CSV_DIR = os.path.join(DATA_DIR, 'csv')                    
+CSV_ROI_DIR    = os.path.join(DATA_DIR, 'csv_roi')         # ROI
+CSV_SQUARE_DIR = os.path.join(DATA_DIR, 'csv_square')      # Square
+
+#Models result folder
+MODELS_DIR = os.path.join(DATA_DIR, 'models')              
+MODELS_ROI_DIR    = os.path.join(DATA_DIR, 'models_roi')    # ROI
+MODELS_SQUARE_DIR = os.path.join(DATA_DIR, 'models_square') # Square
+
+REPORT_DIR     = os.path.join(DATA_DIR, 'reports')

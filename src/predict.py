@@ -49,7 +49,7 @@ def predictImage(
     del image, squared_image, sample, background, sample_path, background_path
 
     extractor = FeatureExtractor()
-    classification_features, regression_features = extractor.extract_features(squared_image_path, os.path.basename(image_path))
+    classification_features, regression_features = extractor.extract_features(sample_path, os.path.basename(image_path))
     if classification_features is None or regression_features is None:
         raise ValueError("Error extracting features")
     

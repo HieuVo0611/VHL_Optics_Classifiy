@@ -1,10 +1,11 @@
 import os
 
-from config import DATA_DIR, META_COLORS
+from config import DATA_DIR, META_COLORS, CSV_ROI_DIR, CSV_SQUARE_DIR, MODELS_ROI_DIR, MODELS_SQUARE_DIR
 from processing import process_data
 from normalize import getFeature
 from model import train_models
 from predict import predictImage
+from visualize import generate_report
 
 def e2e_pipeline() -> None:
     try:
@@ -16,28 +17,49 @@ def e2e_pipeline() -> None:
         print('\nProcessing Data Success!\n')
     except Exception as e:
         print(f'\nProcessing Data Failed: {e}\n')
+    
+    # Pipineline ROI
+    try:
+        getFeature(
+            df_path=META_COLORS,
+            dir_path=os.path.join(DATA_DIR, 'roi image'),
+            out_path=CSV_ROI_DIR,
+            use_square_extras=False
+        )
+        print('\nFeature Extraction (ROI) Success!\n')
+    
+        train_models(
+            meta_path=META_COLORS,
+            dir_path=CSV_ROI_DIR,
+            out_path=MODELS_ROI_DIR,
+            n_estimators=1000,
+            n_splits=5
+        )
+        print('\nTraining Model (ROI) Success!\n')
+    except Exception as e:
+        print(f'\nROI pipeline Failed: {e}\n')
 
+    # Pipeline Square
     try:
         getFeature(
             df_path=META_COLORS,
             dir_path=os.path.join(DATA_DIR, 'square image'),
-            out_path=os.path.join(DATA_DIR, 'csv')
+            out_path=CSV_SQUARE_DIR,
+            use_square_extras=True
         )
-        print('\nFeature Extraction Success!\n')
-    except Exception as e:
-        print(f'\nFeature Extraction Failed: {e}\n')
-
-    try:
+        print('\nFeature Extraction (Square) Success!\n')
+    
         train_models(
             meta_path=META_COLORS,
-            dir_path=os.path.join(DATA_DIR, 'csv'),
-            out_path=os.path.join(DATA_DIR, 'models'),
+            dir_path=CSV_SQUARE_DIR,
+            out_path=MODELS_SQUARE_DIR,
             n_estimators=1000,
             n_splits=5
         )
-        print('\nTraining Model Success!\n')
+        print('\nTraining Model (Square) Success!\n')
     except Exception as e:
-        print(f'\nTraining Model Fail: {e}\n')
+        print(f'\nSquare pipeline Failed: {e}\n')
+
 
 def predict_ui():
     out_path = os.path.join(DATA_DIR, 'predict')
@@ -86,6 +108,7 @@ if __name__ == '__main__':
         choice = input("Do you want to run the end-to-end process? (y/n): ").strip().lower()
         if choice == 'y':
             e2e_pipeline()
+            generate_report()
             break
         elif choice == 'n':
             print("Skipping end-to-end process.")
